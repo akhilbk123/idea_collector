@@ -6,12 +6,17 @@ class Ideas extends StatefulWidget {
 }
 
 class _IdeasState extends State<Ideas> {
+  //List to Store Tile text data
   List<String> _text = ['Idea'];
   TextEditingController _c;
+  var _state1 = 0;
+
+  //List to store the number od widgets created
   List<int> listofwidgets = [];
 
   var i = 0;
 
+//Function that counts the number of tiles
   void additemtolist() {
     List<int> tempList = listofwidgets;
     tempList.add(1);
@@ -20,38 +25,47 @@ class _IdeasState extends State<Ideas> {
     });
   }
 
+//To clear the textfield box
+
   cleartextfield() {
     _c.clear();
   }
 
-  Widget _buildPopupDialog(BuildContext context) {
+//AlertBox Function
+  Widget _buildPopupDialog(BuildContext context, [int index]) {
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(16.0),
-      content: Row(
-        children: [
-          Expanded(
-            child: TextField(
-                autofocus: true,
-                decoration: InputDecoration(
-                    labelText: "Text", hintText: "Input Ideas Here"),
-                controller: _c),
-          ),
-          SizedBox(height: 10.0),
-          TextButton(
-              onPressed: () {
-                setState(() {
-                  if (i == 0) {
-                    this._text[i] = _c.text;
-                  } else {
-                    this._text.add(_c.text);
-                  }
-                });
-                i = i + 1;
-                cleartextfield();
-                Navigator.pop(context);
-              },
-              child: Text("Save"))
-        ],
+      contentPadding: const EdgeInsets.all(10.0),
+      content: Container(
+        height: 200.0,
+        child: Column(
+          children: [
+            Expanded(
+              child: TextField(
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      labelText: "Text", hintText: "Input Ideas Here"),
+                  controller: _c),
+            ),
+            TextButton(
+                onPressed: () {
+                  setState(() {
+                    if (_state1 != 0) {
+                      this._text[index] = _c.text;
+                    } else {
+                      if (i == 0) {
+                        this._text[i] = _c.text;
+                      } else {
+                        this._text.add(_c.text);
+                      }
+                    }
+                  });
+                  i = i + 1;
+                  cleartextfield();
+                  Navigator.pop(context);
+                },
+                child: Text("Save"))
+          ],
+        ),
       ),
     );
   }
@@ -75,6 +89,8 @@ class _IdeasState extends State<Ideas> {
           child: ListView.builder(
               itemCount: listofwidgets.length,
               itemBuilder: (context, index) {
+                final item = _text[index];
+
                 return Container(
                   // height: 200.0,
                   child: Padding(
@@ -83,6 +99,7 @@ class _IdeasState extends State<Ideas> {
                     child: SizedBox(
                       height: 100,
                       child: Card(
+                        key: Key(item),
                         elevation: 10.0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40.0)),
@@ -91,10 +108,11 @@ class _IdeasState extends State<Ideas> {
                               Navigator.pushNamed(context, '/milestones');
                             },
                             onLongPress: () {
+                              _state1 = 1;
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) =>
-                                    _buildPopupDialog(context),
+                                    _buildPopupDialog(context, index),
                               );
                             },
                             title: Padding(
@@ -113,13 +131,25 @@ class _IdeasState extends State<Ideas> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       TextButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            setState(() {
+                                              _text.removeAt(index);
+                                            });
+                                          },
                                           child: Icon(
                                             Icons.delete,
                                             color: Colors.grey[700],
                                           )),
                                       TextButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            _state1 = 1;
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        _buildPopupDialog(
+                                                            context, index));
+                                          },
                                           child: Icon(
                                             Icons.edit,
                                             color: Colors.grey[700],
@@ -138,6 +168,7 @@ class _IdeasState extends State<Ideas> {
               })),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
+            _state1 = 0;
             additemtolist();
             showDialog(
               context: context,
