@@ -10,6 +10,7 @@ class _MilestonesState extends State<Milestones> {
   List<bool> _status = [];
   List<String> _text1 = ['Add Milestones'];
   TextEditingController _c1;
+  var _state1 = 0;
 
   var j = 0;
 
@@ -21,7 +22,11 @@ class _MilestonesState extends State<Milestones> {
     });
   }
 
-  Widget _buildPopup1Dialog(BuildContext context) {
+  cleartext() {
+    _c1.clear();
+  }
+
+  Widget _buildPopup1Dialog(BuildContext context, [int index]) {
     return AlertDialog(
       contentPadding: const EdgeInsets.all(16.0),
       content: Row(
@@ -37,13 +42,18 @@ class _MilestonesState extends State<Milestones> {
           TextButton(
               onPressed: () {
                 setState(() {
-                  if (j == 0) {
-                    this._text1[j] = _c1.text;
+                  if (_state1 != 0) {
+                    this._text1[index] = _c1.text;
                   } else {
-                    this._text1.add(_c1.text);
+                    if (j == 0) {
+                      this._text1[j] = _c1.text;
+                    } else {
+                      this._text1.add(_c1.text);
+                    }
                   }
                 });
                 j = j + 1;
+                cleartext();
                 Navigator.pop(context);
               },
               child: Text("Save"))
@@ -82,6 +92,33 @@ class _MilestonesState extends State<Milestones> {
                     _status[index] = check;
                   });
                 },
+                subtitle: Column(
+                  children: [
+                    Container(
+                      child: Row(
+                        children: [
+                          TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _text1.removeAt(index);
+                                });
+                              },
+                              child:
+                                  Icon(Icons.delete, color: Colors.grey[700])),
+                          TextButton(
+                              onPressed: () {
+                                _state1 = 1;
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        _buildPopup1Dialog(context, index));
+                              },
+                              child: Icon(Icons.edit, color: Colors.grey[700]))
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
               margin: EdgeInsets.all(1.0),
               color: Colors.grey[100],
@@ -91,6 +128,7 @@ class _MilestonesState extends State<Milestones> {
       )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          _state1 = 0;
           createList();
           showDialog(
               context: context,
