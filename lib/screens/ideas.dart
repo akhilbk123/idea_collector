@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:idea_collector/Funcions/usermodel.dart';
 
 class Ideas extends StatefulWidget {
   @override
@@ -31,6 +36,31 @@ class _IdeasState extends State<Ideas> {
     _c.clear();
   }
 
+  Future<Usermodel> createideas(String ideas) async {
+    final String apiurl = 'http://127.0.0.1:8000/api/ideas/';
+
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding': 'gzip, deflate, br'
+    };
+
+    var body = jsonEncode({"ideas": ideas});
+
+    final response = await http.post(Uri.http('10.0.2.2:8000', '/api/ideas/'),
+        headers: headers, body: body);
+
+    if (response.statusCode == 201) {
+      print("Success");
+      final String responseString = response.body;
+
+      return usermodelFromJson(responseString);
+    } else {
+      return null;
+    }
+  }
+
 //AlertBox Function
   Widget _buildPopupDialog(BuildContext context, [int index]) {
     return AlertDialog(
@@ -47,7 +77,10 @@ class _IdeasState extends State<Ideas> {
                   controller: _c),
             ),
             TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final ideas = _c.text;
+                  final Usermodel user = await createideas(ideas);
+
                   setState(() {
                     if (_state1 != 0) {
                       this._text[index] = _c.text;

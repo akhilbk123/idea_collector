@@ -2,6 +2,7 @@
     package="com.example.idea_collector">
    <application
         android:label="idea_collector"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
