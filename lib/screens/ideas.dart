@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:idea_collector/Funcions/usermodel.dart';
+import 'package:idea_collector/screens/milestones.dart';
 
 class Ideas extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _IdeasState extends State<Ideas> {
   List<String> _text = ['Idea'];
   TextEditingController _c;
   var _state1 = 0;
+  String flag;
 
   //List to store the number od widgets created
   List<int> listofwidgets = [];
@@ -37,7 +39,7 @@ class _IdeasState extends State<Ideas> {
   }
 
   Future<Usermodel> createideas(String ideas) async {
-    final String apiurl = 'http://127.0.0.1:8000/api/ideas/';
+    // final String apiurl = 'http://127.0.0.1:8000/api/ideas/';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -93,6 +95,7 @@ class _IdeasState extends State<Ideas> {
                     }
                   });
                   i = i + 1;
+                  flag = _c.text;
                   cleartextfield();
                   Navigator.pop(context);
                 },
@@ -138,7 +141,10 @@ class _IdeasState extends State<Ideas> {
                             borderRadius: BorderRadius.circular(40.0)),
                         child: ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, '/milestones');
+                              // String rawjson = '{"data": flag}';
+                              Map<String, dynamic> map = {"data": flag};
+                              Navigator.pushNamed(context, '/milestones',
+                                  arguments: map);
                             },
                             onLongPress: () {
                               _state1 = 1;

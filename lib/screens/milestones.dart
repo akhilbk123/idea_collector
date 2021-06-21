@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'ideas.dart';
+import 'package:idea_collector/Funcions/usermodel.dart';
+import 'package:http/http.dart' as http;
 
 class Milestones extends StatefulWidget {
   @override
@@ -11,6 +16,8 @@ class _MilestonesState extends State<Milestones> {
   List<String> _text1 = ['Add Milestones'];
   TextEditingController _c1;
   var _state1 = 0;
+  // Map<String, dynamic> data;
+  String idea;
 
   var j = 0;
 
@@ -26,7 +33,43 @@ class _MilestonesState extends State<Milestones> {
     _c1.clear();
   }
 
+  Future<Usermodel> createideas(String milestone, String idea) async {
+    // final String apiurl = 'http://127.0.0.1:8000/api/ideas/';
+
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding': 'gzip, deflate, br'
+    };
+
+    var body = jsonEncode({"milestones": milestone, "Idea": idea});
+
+    final response = await http.post(
+        Uri.http('10.0.2.2:8000', '/api/milestones/'),
+        headers: headers,
+        body: body);
+
+    if (response.statusCode == 201) {
+      print("Success");
+      final String responseString = response.body;
+
+      return usermodelFromJson(responseString);
+    } else {
+      return null;
+    }
+  }
+
   Widget _buildPopup1Dialog(BuildContext context, [int index]) {
+    // final Map<String, dynamic> data_1 = ModalRoute.of(context).settings.arguments;
+
+    onGenerateRoute:
+    (settings) {
+      final Map<String, dynamic> args = settings.arguments;
+
+      return args;
+    };
+    // idea = data["data"];
     return AlertDialog(
       contentPadding: const EdgeInsets.all(16.0),
       content: Row(
@@ -40,7 +83,12 @@ class _MilestonesState extends State<Milestones> {
           ),
           SizedBox(height: 10.0),
           TextButton(
-              onPressed: () {
+              onPressed: () async {
+                final milestone = _c1.text;
+                // final idea = _c.text;
+                final Usermodel user =
+                    await createideas(milestone, args["data"]);
+
                 setState(() {
                   if (_state1 != 0) {
                     this._text1[index] = _c1.text;
